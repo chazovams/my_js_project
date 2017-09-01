@@ -1,13 +1,27 @@
- var div = document.getElementById('submitButton');
- div.addEventListener('click', validate, false);
+ var MyForm = {
+ 	validate: validate,
+ 	getData: getData,
+ 	setData: setData,
+ 	submit: submit
+ }
 
- function validate(e) {
+ var submitButton = document.getElementById('submitButton');
+ submitButton.addEventListener('click', submitIfValid, false);
+
+ function submitIfValid() {
+ 	if (MyForm.validate().isValid) {
+ 		MyForm.submit();
+ 	}
+ }
+
+ function validate() {
  	var validationResult = {
  		isValid : true,
  		invalidFields: []
  	}
 
  	var form = document.getElementById("myForm");
+
  	if (!validateFio(form.fio)) {
  		validationResult.isValid = false;
  		validationResult.invalidFields.push(form.fio.name);
@@ -23,7 +37,7 @@
  	} else {
  		form.email.classList.remove("error");
  	}
- 	
+
  	if (!validatePhone(form.phone)) {
  		validationResult.isValid = false;
  		validationResult.invalidFields.push(form.phone.name);
@@ -31,6 +45,8 @@
  	} else {
  		form.phone.classList.remove("error");
  	}
+
+ 	form.submitButton.disabled = validationResult.isValid;
 
  	return validationResult;
  }
@@ -64,7 +80,52 @@ function validatePhone(phone) {
 		digitsSum += parseInt(item);
 	})
 
-	console.log(digitsSum);
-
 	return digitsSum < 31;
 }
+
+function getData() {
+	var form = document.getElementById("myForm");
+
+	var dataObject = {};
+	dataObject[form.fio.name] = form.fio.value;
+	dataObject[form.email.name] = form.email.value;
+	dataObject[form.phone.name] = form.phone.value;
+
+	return dataObject;
+}
+
+function setData(dataObject) {
+	var form = document.getElementById("myForm");
+
+	form.fio.value = dataObject[form.fio.name];
+	form.email.value = dataObject[form.email.name];
+	form.phone.value = dataObject[form.phone.name];
+}
+
+function submit() {
+  var form = document.getElementById("myForm"); 
+  var formData = MyForm.getData();
+
+  $.ajax({
+      url: form.action,
+  	  dataType: "json",
+      data: formData,
+      success: function(data) {
+          var response = jQuery.parseJSON(data); 
+
+          var resultField = document.querySelector("#resultContainer");
+          resultField.className = "";
+
+          if (response.status == "success") {  
+              resultField.innerHTML = ("Success");
+              resultField.classList.add("success");
+          } else if (response.status == "error") {
+			  resultField.innerHTML = (response.reason);
+          	  resultField.classList.add("error");
+          } else if (response.status == "progress") {
+          	  resultField.classList.add("progress");
+          	  setTimeout(submit(), response.timeout)
+          }
+      }
+  })
+};

@@ -1,6 +1,32 @@
-input:invalid {
+body {
+	color: #2d2d2d;
+}
+
+input {
+	border-width: 1px;
+    margin: 2px 0;
+    padding: 5px;
+}
+
+section {
+	padding: 5px;
+}
+
+.result {
+	margin-top: 15px;
+}
+
+.result .title {
+	padding: 5px;
+}
+
+#resultContainer {
+	border: 1px solid #657b83;
+	width: 300px;
+	height: 100px;
+	padding: 5px;
 }
 
 .error {
-	border: 1px solid red;
+	border: 1px solid red !important;
 }
