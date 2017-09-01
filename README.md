@@ -1,1 +1,1 @@
-# my_lovely_js
+# my_js_project
